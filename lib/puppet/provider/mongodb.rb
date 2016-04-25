@@ -154,10 +154,11 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   end
 
   # Mongo Command Wrapper
-  def self.mongo_eval(cmd, db = 'admin', retries = 10, host = nil)
+  def self.mongo_eval(cmd, db = 'admin', retries = 10, host = nil, skip_mongorc = false)
     retry_count = retries
     retry_sleep = 3
-    if mongorc_file
+
+    if mongorc_file && !skip_mongorc
       cmd = mongorc_file + cmd
     end
 

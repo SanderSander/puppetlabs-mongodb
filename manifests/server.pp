@@ -119,17 +119,16 @@ class mongodb::server (
   if $create_admin {
     validate_string($admin_password)
 
-    mongodb::db { 'admin':
-      user     => $admin_username,
-      password => $admin_password,
-      roles    => $admin_roles
+    mongodb_user { $admin_username:
+      ensure        => present,
+      password_hash => mongodb_password($admin_username, $admin_password),
+      username      => $admin_username,
+      database      => 'admin',
+      roles         => $admin_roles
     }
 
-    # Make sure it runs at the correct point
-    Anchor['mongodb::server::end'] -> Mongodb::Db['admin']
-
     # Make sure it runs before other DB creation
-    Mongodb::Db['admin'] -> Mongodb::Db <| title != 'admin' |>
+    Mongodb_user[$admin_username] -> Mongodb::Db <| |>
   }
 
   # Set-up replicasets
@@ -173,3 +172,4 @@ class mongodb::server (
     }
   }
 }
+s
