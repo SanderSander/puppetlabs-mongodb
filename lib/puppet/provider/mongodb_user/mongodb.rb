@@ -28,6 +28,11 @@ Puppet::Type.type(:mongodb_user).provide(:mongodb, :parent => Puppet::Provider::
         end
         return allusers
       else
+        begin
+          users = JSON.parse mongo_eval('printjson(db.system.users.find().toArray())')
+        rescue => e
+          return []
+        end
 
         # Return an empty list when client isn't authenticated. this is needed to makes it possible to try a call to the createUser command
         status = JSON.parse mongo_eval('printjson(db.runCommand({connectionStatus: 1}))');

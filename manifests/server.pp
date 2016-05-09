@@ -121,11 +121,14 @@ class mongodb::server (
 
     mongodb_user { $admin_username:
       ensure        => present,
-      password_hash => mongodb_password($admin_username, $admin_password),
-      username      => $admin_username,
-      database      => 'admin',
-      roles         => $admin_roles
+      username => $admin_username,
+      password_hash =>  mongodb_password($admin_username, $admin_password),
+      roles    => $admin_roles,
+      database => 'admin'
     }
+
+    # Make sure it runs at the correct point
+    Anchor['mongodb::server::end'] -> Mongodb_user[$admin_username]
 
     # Make sure it runs before other DB creation
     Mongodb_user[$admin_username] -> Mongodb::Db <| |>
@@ -172,4 +175,4 @@ class mongodb::server (
     }
   }
 }
-s
+
